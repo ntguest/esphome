@@ -1,0 +1,10 @@
+substitutions:
+  name: ""
+  friendly_name: ""
+  project_name: "ntguest"
+  project_version: "0.1"
+  statuspin: GPIO2
+
+esp8266:
+  board: d1_mini
+  restore_from_flash: true
