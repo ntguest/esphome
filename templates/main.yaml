@@ -18,7 +18,7 @@ logger:
 
 api:
   encryption:
-    key: ${apikey}
+    key: ${key}
   reboot_timeout: 0s
 
 web_server:
