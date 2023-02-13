@@ -15,5 +15,8 @@ esp8266:
 
 packages:
   remote_package:
-    url: https://github.com/ntguest/esphome    
-    files: [/template.yaml]
+    url: https://github.com/ntguest/esphome
+    ref: main
+    files:
+      - templates/main.yaml
+    refresh: 0s
