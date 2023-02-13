@@ -7,7 +7,7 @@ substitutions:
   ssid: !secret ssid
   password: !secret password
   key: !secret apikey
-  board: d1_mini  # esp8285, 
+  board: d1_mini  # esp8285, nodemcuv2
 
 esp8266:
   board: ${board}
