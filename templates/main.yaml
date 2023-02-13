@@ -9,7 +9,7 @@ wifi:
 
   ap:
     ssid: "${friendly_name} Hotspot"
-    password: ${password}
+    password: ${ota}
 
 captive_portal:
 
