@@ -32,10 +32,10 @@ time:
     id: sntp_time
     timezone: UA
 
-#status_led:
-#  pin:
-#    number: ${statuspin}
-#    inverted: True
+status_led:
+  pin:
+    number: ${statuspin}
+    inverted: True
 
 binary_sensor:
   - platform: status
