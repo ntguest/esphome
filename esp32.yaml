@@ -1,0 +1,14 @@
+substitutions:
+  name: ""
+  friendly_name: ""
+  project_name: "ntguest"
+  project_version: "0.1"
+  statuspin: GPIO5
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+esp32_ble_tracker:
+bluetooth_proxy:
