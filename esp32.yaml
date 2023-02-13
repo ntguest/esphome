@@ -12,3 +12,8 @@ esp32:
 
 esp32_ble_tracker:
 bluetooth_proxy:
+
+packages:
+  remote_package:
+    url: https://github.com/ntguest/esphome    
+    files: [/template.yaml]
