@@ -9,7 +9,7 @@ wifi:
 
   ap:
     ssid: "${friendly_name} Hotspot"
-    password: ${ota}
+    password: ${password}
 
 captive_portal:
 
@@ -25,7 +25,7 @@ web_server:
   port: 80
   
 ota:
-  password: ${password}
+  password: ${ota}
 
 time:
   - platform: sntp
