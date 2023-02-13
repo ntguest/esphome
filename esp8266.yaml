@@ -4,13 +4,16 @@ substitutions:
   project_name: "ntguest"
   project_version: "0.1"
   statuspin: GPIO2
+  ssid: !secret ssid
+  password: !secret password
+  key: !secret apikey
+  board: d1_mini  # esp8285, 
 
 esp8266:
-  board: d1_mini  # esp8285, 
+  board: ${board}
   restore_from_flash: true
 
 packages:
   remote_package:
     url: https://github.com/ntguest/esphome    
     files: [/template.yaml]
-
