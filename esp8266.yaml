@@ -6,5 +6,5 @@ substitutions:
   statuspin: GPIO2
 
 esp8266:
-  board: d1_mini  # esp8285 
+  board: d1_mini  # esp8285, 
   restore_from_flash: true
