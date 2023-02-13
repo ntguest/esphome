@@ -4,6 +4,10 @@ substitutions:
   project_name: "ntguest"
   project_version: "0.1"
   statuspin: GPIO5
+  ssid: !secret ssid
+  password: !secret password
+  key: !secret apikey
+  board: esp32dev
 
 esp32:
   board: esp32dev
@@ -15,5 +19,8 @@ bluetooth_proxy:
 
 packages:
   remote_package:
-    url: https://github.com/ntguest/esphome    
-    files: [/template.yaml]
+    url: https://github.com/ntguest/esphome
+    ref: main
+    files:
+      - templates/main.yaml
+    refresh: 0s
