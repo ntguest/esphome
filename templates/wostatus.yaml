@@ -11,7 +11,7 @@ wifi:
     ssid: "${friendly_name} Hotspot"
     password: ${password}
 
-captive_portal:
+#captive_portal:
 
 logger:
   baud_rate: 0
@@ -32,9 +32,9 @@ time:
     id: sntp_time
     timezone: UA
 
-binary_sensor:
-  - platform: status
-    name: "${friendly_name} Status"
+#binary_sensor:
+#  - platform: status
+#    name: "${friendly_name} Status"
 
 sensor:
   - platform: wifi_signal
@@ -49,6 +49,6 @@ button:
   - platform: restart
     name: "${friendly_name} Restart"
 
-  - platform: factory_reset
-    name: Restart with Factory Default Settings
-    id: Reset
+ # - platform: factory_reset
+ #   name: Restart with Factory Default Settings
+ #   id: Reset
