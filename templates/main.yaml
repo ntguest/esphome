@@ -40,15 +40,15 @@ status_led:
 
 binary_sensor:
   - platform: status
-    name: "${uname} Status"
+    name: "Status"
 
 sensor:
   - platform: wifi_signal
-    name: "${uname} WiFi Signal"
+    name: "WiFi Signal"
     icon: mdi:signal
 
   - platform: uptime
-    name: "${uname} Uptime"
+    name: "Uptime"
     device_class: "duration"
     
 button:
