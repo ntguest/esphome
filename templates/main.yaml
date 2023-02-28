@@ -53,7 +53,7 @@ sensor:
     
 button:
   - platform: restart
-    name: "${uname} Restart"
+    name: "Restart"
 
   - platform: factory_reset
     name: Restart with Factory Default Settings
