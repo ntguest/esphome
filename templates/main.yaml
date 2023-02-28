@@ -8,7 +8,7 @@ wifi:
   fast_connect: true
 
   ap:
-    ssid: "${friendly_name} Hotspot"
+    ssid: "${uname} Hotspot"
     password: ${password}
 
 captive_portal:
@@ -39,20 +39,20 @@ status_led:
 
 binary_sensor:
   - platform: status
-    name: "${friendly_name} Status"
+    name: "${uname} Status"
 
 sensor:
   - platform: wifi_signal
-    name: "${friendly_name} WiFi Signal"
+    name: "${uname} WiFi Signal"
     icon: mdi:signal
 
   - platform: uptime
-    name: "${friendly_name} Uptime"
+    name: "${uname} Uptime"
     device_class: "duration"
     
 button:
   - platform: restart
-    name: "${friendly_name} Restart"
+    name: "${uname} Restart"
 
   - platform: factory_reset
     name: Restart with Factory Default Settings
