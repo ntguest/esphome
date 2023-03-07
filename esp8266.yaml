@@ -8,7 +8,7 @@ substitutions:
   password: !secret password
   key: !secret apikey
   ota: !secret ota
-  board: d1_mini  # esp8285, nodemcuv2
+  board: d1_mini  # esp8285, nodemcuv2, esp01_1m
 
 esp8266:
   board: ${board}
