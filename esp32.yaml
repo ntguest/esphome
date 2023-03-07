@@ -8,7 +8,7 @@ substitutions:
   password: !secret password
   key: !secret apikey
   ota: !secret ota
-  board: esp32dev
+  board: esp32dev, lolin_d32
 
 esp32: 
   board: ${board}
