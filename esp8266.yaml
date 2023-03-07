@@ -1,6 +1,6 @@
 substitutions:
   name: ""
-  friendly_name: ""
+  uname: ""
   project_name: "ntguest"
   project_version: "0.1"
   statuspin: GPIO2
