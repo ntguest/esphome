@@ -36,7 +36,7 @@ time:
 status_led:
   pin:
     number: ${statuspin}
-    inverted: True
+#    inverted: True
 
 binary_sensor:
   - platform: status
