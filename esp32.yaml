@@ -25,3 +25,7 @@ packages:
     files:
       - templates/main.yaml
     refresh: 0s
+
+sensor:
+  - platform: internal_temperature
+    name: "Internal Temperature"
