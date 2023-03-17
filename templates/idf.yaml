@@ -1,0 +1,55 @@
+esphome:
+  name: ${name}
+  friendly_name: ${uname}
+
+wifi:
+  ssid: ${ssid}
+  password: ${password}
+  reboot_timeout: 0s
+  fast_connect: true
+
+  ap:
+    ssid: "${uname} Hotspot"
+    password: ${password}
+
+logger:
+  baud_rate: 0
+
+api:
+  encryption:
+    key: ${key}
+  reboot_timeout: 0s
+  
+ota:
+  password: ${ota}
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: UA
+
+status_led:
+  pin:
+    number: ${statuspin}
+#    inverted: True
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    icon: mdi:signal
+
+  - platform: uptime
+    name: "Uptime"
+    device_class: "duration"
+    
+button:
+  - platform: restart
+    name: "Restart"
+
+  - platform: factory_reset
+    name: Restart with Factory Default Settings
+    id: Reset
