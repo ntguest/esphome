@@ -23,7 +23,7 @@ packages:
     url: https://github.com/ntguest/esphome
     ref: main
     files:
-      - templates/main.yaml
+      - templates/main.yaml # idf
     refresh: 0s
 
 sensor:
