@@ -8,12 +8,12 @@ substitutions:
   password: !secret password
   key: !secret apikey
   ota: !secret ota
-  board: esp32dev, lolin_d32
+  board: esp32dev # lolin_d32 esp32-c3-devkitm-1
 
 esp32: 
   board: ${board}
   framework:
-    type: arduino
+    type: arduino # idf
 
 esp32_ble_tracker:
 bluetooth_proxy:
