@@ -15,3 +15,8 @@ web_server:
   
 ota:
   password: ${ota}
+
+api:
+  encryption:
+    key: ${key}
+  reboot_timeout: 0s
