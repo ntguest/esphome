@@ -60,7 +60,7 @@ wifi:
 esphome:
   name: ${name}
   friendly_name: ${uname}
-  min_version: 2022.10.2
+#  min_version: 2022.10.2
 #  on_boot:
 #    priority: 601
 #    then:
