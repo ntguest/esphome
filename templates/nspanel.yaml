@@ -61,10 +61,10 @@ esphome:
   name: ${name}
   friendly_name: ${uname}
   min_version: 2022.10.2
-  on_boot:
-    priority: 601
-    then:
-      - lambda: id(disp1).send_command_printf("DRAKJHSUYDGBNCJHGJKSHBDN");
+#  on_boot:
+#    priority: 601
+#    then:
+#      - lambda: id(disp1).send_command_printf("DRAKJHSUYDGBNCJHGJKSHBDN");
 
 ##### TYPE OF ESP BOARD #####
 esp32:
