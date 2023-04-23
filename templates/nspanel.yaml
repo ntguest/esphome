@@ -119,6 +119,26 @@ uart:
   baud_rate: 115200
   id: tf_uart
 
+button:
+  ###### REBOOT BUTTON #####
+  - platform: restart
+    name: Reboot
+    id: restart_nspanel
+
+- platform: factory_reset
+    name: Restart with Factory Default Settings
+    id: Reset
+
+##### UPDATE TFT DISPLAY #####
+  - platform: template
+    name: Update TFT display
+    icon: mdi:file-sync
+    id: tft_update
+    entity_category: config
+    on_press:
+      - delay: 16ms
+      - lambda: id(disp1).upload_tft();
+
 api:
   encryption:
     key: ${key}
