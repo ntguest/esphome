@@ -126,7 +126,7 @@ button:
     name: Reboot
     id: restart_nspanel
 
-- platform: factory_reset
+  - platform: factory_reset
     name: Restart with Factory Default Settings
     id: Reset
 
