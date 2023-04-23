@@ -33,9 +33,11 @@
 
 ##### WIFI SETUP #####
 wifi:
-  ssid: ${wifi_ssid}
-  password: ${wifi_password}
+  ssid: ${ssid}
+  password: ${password}
   power_save_mode: none
+  reboot_timeout: 0s
+  fast_connect: true
   ##### advanced config - uncomment to use static IP-Config #####
   # manual_ip:
   #   static_ip: ${ip}
@@ -45,8 +47,8 @@ wifi:
   # domain: ${domain}
   ##### Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "${device_name}"
-    password: ${wifi_password}
+    ssid: "${uname} Hotspot"
+    password: ${password}
 
 ##### Functionality for the Nextion display #####
 # external_components:
@@ -56,7 +58,8 @@ wifi:
 
 ##### ESPHOME CONFIGURATION #####
 esphome:
-  name: ${device_name}
+  name: ${name}
+  friendly_name: ${uname}
   min_version: 2022.10.2
   on_boot:
     priority: 601
@@ -73,18 +76,23 @@ web_server:
   port: 80
   auth:
     username: admin
-    password: ${wifi_password}
+    password: ${ota}
     ##### advanced config - change to use web_password #####
     # password: ${web_password}
 
 ##### OTA PASSWORD #####
 ota:
-  password: ${wifi_password}
+  password: ${ota}
   ##### advanced config - change to use ota_password #####
   # password: ${ota_password}
-  safe_mode: true
-  reboot_timeout: 3min
-  num_attempts: 3
+  # safe_mode: true
+  # reboot_timeout: 3min
+  # num_attempts: 3
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: UA
 
 ##### LOGGER #####
 logger:
@@ -115,12 +123,16 @@ uart:
 button:
   ###### REBOOT BUTTON #####
   - platform: restart
-    name: ${device_name} Restart
+    name: Reboot
     id: restart_nspanel
 
-  ##### UPDATE TFT DISPLAY #####
+- platform: factory_reset
+    name: Restart with Factory Default Settings
+    id: Reset
+
+##### UPDATE TFT DISPLAY #####
   - platform: template
-    name: ${device_name} Update TFT display
+    name: Update TFT display
     icon: mdi:file-sync
     id: tft_update
     entity_category: config
@@ -130,6 +142,9 @@ button:
 
 ##### START - API CONFIGURATION #####
 api:
+  encryption:
+    key: ${key}
+  reboot_timeout: 0s
   ##### advanced config - activate to use api_password #####
   # password: ${api_password}
   services:
@@ -404,7 +419,7 @@ binary_sensor:
 
   ###### LEFT BUTTON BELOW DISPLAY TO TOGGLE RELAY#####
   - platform: gpio
-    name: ${device_name} Left Button
+    name: Left Button
     id: left_button
     pin:
       number: 14
@@ -432,7 +447,7 @@ binary_sensor:
 
   ##### RIGHT BUTTON BELOW DISPLAY TO TOGGLE RELAY #####
   - platform: gpio
-    name: ${device_name} Right Button
+    name: Right Button
     id: right_button
     pin:
       number: 27
@@ -459,7 +474,7 @@ binary_sensor:
 
   ##### JUMP PAGE TO SETTING PAGE #####
   - platform: nextion
-    name: $device_name setting page
+    name: setting page
     page_id: 0
     component_id: 52
     internal: true
@@ -471,7 +486,7 @@ binary_sensor:
 
   ##### Restart NSPanel Button - Setting Page #####
   - platform: nextion
-    name: ${device_name} Restart
+    name: Restart
     page_id: 7
     component_id: 13
     internal: true
@@ -480,7 +495,7 @@ binary_sensor:
 
   ##### Restart NSPanel Button - Boot Page #####
   - platform: nextion
-    name: ${device_name} Restart
+    name: Restart
     page_id: 8
     component_id: 4
     internal: true
@@ -489,7 +504,7 @@ binary_sensor:
 
   ##### Sleep Modus NSPanel Button #####
   - platform: nextion
-    name: ${device_name} Sleep Modus
+    name: Sleep Modus
     page_id: 7
     component_id: 14
     internal: true
@@ -513,12 +528,13 @@ sensor:
 
   ##### Uptime #####
   - platform: uptime
-    name: ${device_name} uptime
-    disabled_by_default: true
+    name: "Uptime"
+    device_class: "duration"
 
   ##### WIFI Signal stregth
   - platform: wifi_signal
-    name: ${device_name} RSSI
+    name: WiFi Signal
+    icon: mdi:signal
     update_interval: 60s
     on_value:
       - if:
@@ -545,7 +561,7 @@ sensor:
 
   ##### INTERNAL TEMPERATURE SENSOR, resistance to temperature (calculation) #####
   - platform: ntc
-    name: ${device_name} Temperature
+    name: Room Temperature
     id: temp_nspanel
     sensor: resistance_sensor
     calibration:
@@ -563,7 +579,7 @@ sensor:
 
   ##### current value of page-climate target_temp #####
   - platform: template
-    name: ${device_name} Display Target Temperature
+    name: Display Target Temperature
     id: display_target_temp
     lambda: return {};
     update_interval: 10s
@@ -571,7 +587,7 @@ sensor:
   ###### Display Brightness GET VALUE FROM NSPanel SLIDER #####
   - platform: nextion
     id: brightslider
-    name: ${device_name} brightness Slider
+    name: brightness Slider
     variable_name: brightslider
     internal: true
     on_value:
@@ -587,7 +603,7 @@ sensor:
   ###### Display DIM Brightness GET VALUE FROM NSPanel SLIDER #####
   - platform: nextion
     id: dimslider
-    name: ${device_name} dim brightness slider
+    name: dim brightness slider
     variable_name: dimslider
     internal: true
     on_value:
@@ -617,37 +633,37 @@ text_sensor:
 
   ##### ESPhome version used to compile the app #####
   - platform: version
-    name: ${device_name} ESPhome Version
+    name: ESPhome Version
     disabled_by_default: true
 
   - platform: wifi_info
     ip_address:
-      name: ${device_name} IP
+      name: IP
       disabled_by_default: true
       id: ip_address
     ssid:
-      name: ${device_name} SSID
+      name: SSID
       disabled_by_default: true
     bssid:
-      name: ${device_name} BSSID
+      name: BSSID
       disabled_by_default: true
 
   - platform: template
-    name: ${device_name} Notification Label
+    name: Notification Label
     id: notification_label
 
   - platform: template
-    name: ${device_name} Notification Text
+    name: Notification Text
     id: notification_text
 
   - platform: template
-    name: ${device_name} Settings Entity
+    name: Settings Entity
     id: settings_entity
 
   ##### last click sensor, the main action variable - push to HA #####
   - platform: nextion
     nextion_id: disp1
-    name: ${device_name} Last Click
+    name: Last Click
     id: disp1_lastclick_general
     update_interval: 50ms
     component_name: lastclick
@@ -670,7 +686,7 @@ text_sensor:
   ##### last click lightsettings page, the main action variable - push to HA #####
   - platform: nextion
     nextion_id: disp1
-    name: ${device_name} last click lightsettings
+    name: last click lightsettings
     id: disp1_lastclick_lightsettings
     update_interval: 50ms
     component_name: lightsetting
@@ -693,7 +709,7 @@ text_sensor:
   ##### last click coversettings page, the main action variable - push to HA #####
   - platform: nextion
     nextion_id: disp1
-    name: ${device_name} last click coversettings
+    name: last click coversettings
     id: disp1_lastclick_coversettings
     update_interval: 50ms
     component_name: coversetting
@@ -716,7 +732,7 @@ text_sensor:
   ##### last click climate page, the main action variable - push to HA #####
   - platform: nextion
     nextion_id: disp1
-    name: ${device_name} last click climatesettings
+    name: last click climatesettings
     id: disp1_lastclick_climatesettings
     update_interval: 50ms
     component_name: climatesetting
@@ -739,7 +755,7 @@ text_sensor:
   ##### currentpage sensor, the main action variable - push to HA #####
   - platform: nextion
     nextion_id: disp1
-    name: ${device_name} currentpage
+    name: currentpage
     id: disp1_currentpage
     update_interval: 50ms
     component_name: currentpage
@@ -763,7 +779,7 @@ text_sensor:
   ##### touchevent sensor, Reset the page timeout #####
   - platform: nextion
     nextion_id: disp1
-    #name: ${device_name} touchevent
+    #name: touchevent
     id: disp1_touchevent
     update_interval: 50ms
     component_name: touchevent
@@ -797,7 +813,7 @@ switch:
 
   ##### global variable to keep track on whether the Nextion display is ready or not. Delays initial info from HA to the display #####
   - platform: template
-    name: ${device_name} Nextion inited
+    name: Nextion inited
     id: nextion_init
     entity_category: config
     restore_state: false
@@ -806,7 +822,7 @@ switch:
 
   ##### Notification unread #####
   - platform: template
-    name: ${device_name} Notification unread
+    name: Notification unread
     id: notification_unread
     entity_category: config
     restore_state: true
@@ -814,7 +830,7 @@ switch:
 
   ##### Notification sound #####
   - platform: template
-    name: ${device_name} Notification sound
+    name: Notification sound
     id: notification_sound
     entity_category: config
     restore_state: true
@@ -822,7 +838,7 @@ switch:
 
   ##### Confirmation Message #####
   - platform: template
-    name: ${device_name} Confirmation Message
+    name: Confirmation Message
     id: confirmation_message
     entity_category: config
     restore_state: false
@@ -830,21 +846,21 @@ switch:
 
   ##### PHYSICAL SWITCH 1 #####
   - platform: gpio
-    name: ${device_name} Relay 1
+    name: Relay 1
     id: relay_1
     pin:
       number: 22
 
   ##### PHYSICAL SWITCH 2 ######
   - platform: gpio
-    name: ${device_name} Relay 2
+    name: Relay 2
     id: relay_2
     pin:
       number: 19
 
   ##### DISPLAY ALWAYS ON #####
   - platform: gpio
-    name: ${device_name} Screen Power
+    name: Screen Power
     id: screen_power
     entity_category: config
     pin:
@@ -856,7 +872,7 @@ switch:
   ##### Switch Display Sleep Modus #####
   - platform: template
     device_class: switch
-    name: ${device_name} Sleep Modus
+    name: Sleep Modus
     id: sleep_modus
     entity_category: config
     restore_state: true
@@ -877,14 +893,14 @@ switch:
 
   ##### Relay Local control Fallback #####
   - platform: template
-    name: ${device_name} Relay 1 Local Fallback
+    name: Relay 1 Local Fallback
     id: relay1_fallback
     entity_category: config
     restore_state: true
     optimistic: true
 
   - platform: template
-    name: ${device_name} Relay 2 Local Fallback
+    name: Relay 2 Local Fallback
     id: relay2_fallback
     entity_category: config
     restore_state: true
@@ -895,7 +911,7 @@ number:
 
   ##### SCREEN BRIGHTNESS #####
   - platform: template
-    name: ${device_name} Display Brightness
+    name: Display Brightness
     id: display_brightness
     entity_category: config
     unit_of_measurement: '%'
@@ -914,7 +930,7 @@ number:
 
   ##### SCREEN BRIGHTNESS DIMMED DOWN #####
   - platform: template
-    name: ${device_name} Display Brightness Dimdown
+    name: Display Brightness Dimdown
     id: display_dim_brightness
     entity_category: config
     unit_of_measurement: '%'
@@ -932,7 +948,7 @@ number:
 
   ##### Temperature Correction #####
   - platform: template
-    name: ${device_name} Temperature Correction
+    name: Temperature Correction
     id: temperature_correction
     entity_category: config
     unit_of_measurement: '°C'
@@ -949,7 +965,7 @@ number:
 
 ##### page-timeout #####
   - platform: template
-    name: ${device_name} Page Timeout
+    name: Page Timeout
     id: page_timeout
     entity_category: config
     min_value: 0
