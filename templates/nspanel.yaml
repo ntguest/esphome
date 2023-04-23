@@ -118,3 +118,8 @@ uart:
   rx_pin: 17
   baud_rate: 115200
   id: tf_uart
+
+api:
+  encryption:
+    key: ${key}
+  reboot_timeout: 0s
