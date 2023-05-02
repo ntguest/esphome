@@ -1,0 +1,420 @@
+substitutions:
+  hiprotect: '253.0' # ДСТУ ЕN 50160:2014
+  loprotect: '207.0'
+
+#5v
+  txpin: GPIO1  
+  rxpin: GPIO3
+
+  dallaspin: GPIO2
+
+  pirpin1: GPIO35
+
+  relaypin1: GPIO14
+  relaypin2: GPIO15
+
+#3v
+  sdapin: GPIO33
+  sclpin: GPIO32
+
+  raindpin: GPIO36
+  rainapin: GPIO39
+
+  acpin: GPIO5
+
+ #GND
+  contactpin1: GPIO4
+
+esp32: 
+  board: esp32dev
+  framework:
+    type: arduino
+
+esphome:
+  on_boot:
+    priority: 700
+    then:
+      - if:
+          condition:
+            lambda: 'return id(ac_a).state;'
+          then:
+            - sensor.template.publish:
+                id: cur
+                state: !lambda 'return id(cur_a).state;'
+            - sensor.template.publish:
+                id: vol
+                state: !lambda 'return id(volt_a).state;'
+            - sensor.template.publish:
+                id: pw
+                state: !lambda 'return id(pow_a).state;'
+            - sensor.template.publish:
+                id: fr
+                state: !lambda 'return id(freq_a).state;'
+            - sensor.template.publish:
+                id: pf
+                state: !lambda 'return id(pf_a).state;'
+          else:
+            - sensor.template.publish:
+                id: cur
+                state: 0.0
+            - sensor.template.publish:
+                id: vol
+                state: 0.0
+            - sensor.template.publish:
+                id: pw
+                state: 0.0
+            - sensor.template.publish:
+                id: fr
+                state: 0.0
+            - sensor.template.publish:
+                id: pf
+                state: 0.0
+  name: "officehub"
+  friendly_name: "OfficeHub"
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO0_IN
+  phy_addr: 1
+  power_pin: GPIO16
+
+
+api:
+  encryption:
+    key: "C9rmVkEMPr7vZKvc3QXKOpalthl1+7cnzRpLeU2NHac="
+  reboot_timeout: 0s
+
+web_server:
+  port: 6123
+#  auth:
+#    username: admin
+#    password: "0fficehub"
+  version: 1
+  
+ota:
+  password: "0fficehub"
+
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: UA
+
+logger:
+
+uart:
+  tx_pin: $txpin
+  rx_pin: $rxpin
+  baud_rate: 9600
+  id: uart_a
+
+#dallas:
+#  - pin: $dallaspin
+external_components:
+    - source: github://nrandell/dallasng
+dallasng:
+    - pin: $dallaspin
+      update_interval: 5s
+
+i2c:
+  sda: $sdapin
+  scl: $sclpin
+  scan: true
+  id: i2c_a
+
+switch:
+  - platform: gpio
+    name: "Relay 1"
+    id: relay_a
+    pin: $relaypin1
+    inverted: true
+
+  - platform: gpio
+    name: "Relay 2"
+    id: relay_b
+    pin: $relaypin2
+    inverted: true
+
+  - platform: restart
+    name: "Restart"
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+  - platform: gpio
+    name: "Rain"
+    id: rain_a
+    pin: $raindpin
+    device_class: "moisture" 
+    filters:
+      - invert:
+      - delayed_on_off: 100ms
+
+# Датчик наличия переменного напряжения. При отсутствии напряжения обнуляются представления напряжения, тока, потребляемой мощности, частоты и коэф реактивной энергии.
+  - platform: gpio
+    id: ac_a
+    pin: $acpin
+    filters:
+      - invert:
+    on_release:
+      then:
+        - sensor.template.publish:
+            id: cur
+            state: 0.0
+        - sensor.template.publish:
+            id: vol
+            state: 0.0
+        - sensor.template.publish:
+            id: pw
+            state: 0.0
+        - sensor.template.publish:
+            id: pf
+            state: 0.0
+        - sensor.template.publish:
+            id: fr
+            state: 0.0
+
+  - platform: gpio
+    name: "Contact 1"
+    id: cont_a
+    pin:
+      number: $contactpin1
+      mode:
+        input: true
+        pullup: true
+    device_class: "door" # variants window
+    filters:
+      - delayed_on_off: 100ms
+
+  - platform: gpio
+    name: "Motion 1"
+    id: pir_a
+    pin: $pirpin1
+    device_class: "motion" # variants window
+    filters:
+      - delayed_on: 100ms
+      - delayed_off: 180s
+    on_press:
+      then:
+        - switch.turn_on: relay_a
+    on_release:
+      then:
+        - switch.turn_off: relay_a
+
+sensor:
+
+  - platform: adc
+    pin: $rainapin
+    raw: true
+    id: rain_b
+    update_interval: 6s
+    attenuation: 11db
+
+  - platform: template
+    name: "Rain intensity"
+    accuracy_decimals: 0
+    update_interval: 6s
+    device_class: precipitation
+    state_class: measurement
+    unit_of_measurement: "%"
+    id: rain_c
+    lambda: !lambda |-
+      return (100-(id(rain_b).state/4095 * 100));
+
+# Цифровой датчик освещенности. Шина i2c, адрес 0x4A.  https://esphome.io/components/sensor/max44009.html
+  - platform: max44009
+    name: "Illuminance"
+    id: ill_a
+    address: 0x4A
+    device_class: "illuminance"
+    accuracy_decimals: 0
+    update_interval: 6s
+
+# Цифровой датчик температуры, влажности давления. Шина i2c, адрес 0x76. https://esphome.io/components/sensor/bme280.html
+  - platform: bme280
+    temperature:
+      name: "Indoor Temperature"
+      id: temp_a
+      oversampling: 16x
+      accuracy_decimals: 1
+#      filters:
+#        - calibrate_linear:
+#          - 0.0 -> 0.0       # Обязательно
+#          - 10.0 -> 12.0
+#          - 25.0 -> 24.5
+    pressure:
+      name: "Pressure"
+      id: press_a
+      accuracy_decimals: 0
+    humidity:
+      name: "Indoor Humidity"
+      id: hum_a
+      accuracy_decimals: 0
+    address: 0x76
+
+#    Датчик переменного напряжения и тока с фильтрацией стартовых бросков. https://esphome.io/components/sensor/pzemac.html
+  - platform: pzemac
+    current:
+      accuracy_decimals: 2
+      id: cur_a
+      filters:
+        - lambda: |-
+           return x > 100 ? 100 : x;
+      on_value:
+        then:
+          if:
+            condition:
+              lambda: 'return id(ac_a).state;'
+            then:
+              - sensor.template.publish:
+                  id: cur
+                  state: !lambda 'return id(cur_a).state;'
+            else:
+              - sensor.template.publish:
+                  id: cur
+                  state: 0.0
+    voltage:
+      accuracy_decimals: 1
+      id: volt_a
+      filters:
+        - lambda: |-
+           return x > 300 ? 300 : x < 80 ? 0 : x;
+      on_value_range:
+        - above: $hiprotect
+          then:
+            - switch.turn_off: relay_b
+        - below: $loprotect
+          then:
+            - switch.turn_off: relay_b
+      on_value:
+        then:
+          if:
+            condition:
+              lambda: 'return id(ac_a).state;'
+            then:
+              - sensor.template.publish:
+                  id: vol
+                  state: !lambda 'return id(volt_a).state;'
+            else:
+              - sensor.template.publish:
+                  id: vol
+                  state: 0.0
+    power:
+      accuracy_decimals: 1
+      id: pow_a
+      filters:
+        - lambda: |-
+           return x > 30000 ? 30000 : x;
+      on_value:
+        then:
+          if:
+            condition:
+              lambda: 'return id(ac_a).state;'
+            then:
+              - sensor.template.publish:
+                  id: pw
+                  state: !lambda 'return id(pow_a).state;'
+            else:
+              - sensor.template.publish:
+                  id: pw
+                  state: 0.0
+    frequency:
+      id: freq_a
+      on_value:
+        then:
+          if:
+            condition:
+              lambda: 'return id(ac_a).state;'
+            then:
+              - sensor.template.publish:
+                  id: fr
+                  state: !lambda 'return id(freq_a).state;'
+            else:
+              - sensor.template.publish:
+                  id: fr
+                  state: 0.0
+    power_factor:
+      id: pf_a
+      on_value:
+        then:
+          if:
+            condition:
+              lambda: 'return id(ac_a).state;'
+            then:
+              - sensor.template.publish:
+                  id: pf
+                  state: !lambda 'return id(pf_a).state;'
+            else:
+              - sensor.template.publish:
+                  id: pf
+                  state: 0.0
+    update_interval: 6s
+
+  - platform: template
+    name: "Current"
+    id: cur
+    device_class: current
+    unit_of_measurement: A
+    state_class: measurement
+
+  - platform: template
+    name: "Voltage"
+    id: vol
+    device_class: voltage
+    unit_of_measurement: V
+    state_class: measurement
+
+  - platform: template
+    name: "Power"
+    id: pw
+    device_class: power
+    unit_of_measurement: W
+    state_class: measurement
+
+  - platform: template
+    name: "Frequency"
+    id: fr
+    device_class: frequency
+    unit_of_measurement: Hz
+    state_class: measurement
+
+  - platform: template
+    name: "Power Factor"
+    id: pf
+    device_class: power_factor
+    unit_of_measurement: "%"
+    state_class: measurement
+
+#    Цифровые датчики в герметичном исполнении. Обязательно указывается уникальный адрес датчика. https://esphome.io/components/sensor/dallas.html
+#  - platform: dallas
+#    address: 0x043c5ce38155fc28   # уникальный адрес датчика
+#    name: "Outdoor Temperature 1"
+#    accuracy_decimals: 1
+#    id: temp_out_a
+#  - platform: dallas
+#    address: 0xee3cfae381692628   # уникальный адрес датчика
+#    name: "Outdoor Temperature 2"
+#    accuracy_decimals: 1
+#    id: temp_out_b
+
+
+  - platform: dallasng
+    address: 0x043c5ce38155fc28
+    id: temp_out_a
+    unit_of_measurement: "°C"
+    name: "Outdoor Temperature 1"
+    filters:
+    - filter_out: NAN
+  - platform: dallasng
+    address: 0xee3cfae381692628
+    id: temp_out_b
+    unit_of_measurement: "°C"
+    name: "Outdoor Temperature 2"
+    filters:
+    - filter_out: NAN
+
+  - platform: uptime
+    name: "Uptime"
+    device_class: "duration"
