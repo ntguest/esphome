@@ -17,10 +17,10 @@ captive_portal:
 logger:
   baud_rate: 0
 
-# api:
-#  encryption:
-#    key: ${key}
-#  reboot_timeout: 0s
+api:
+  encryption:
+   key: ${key}
+  reboot_timeout: 0s
 
 web_server:
   port: 80
