@@ -40,6 +40,7 @@ status_led:
 
 binary_sensor:
   - platform: status
+    id: stat
     name: "Status"
 
 sensor:
