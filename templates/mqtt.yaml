@@ -1,4 +1,4 @@
 mqtt:
-  broker: ${ip_mqtt}
-  username: ${user_mqtt}
-  password: ${password_mqtt}
+  broker: ${ipmqtt}
+  username: ${usermqtt}
+  password: ${passwordmqtt}
