@@ -1,3 +1,7 @@
 esphome:
   name: ${name}
   friendly_name: ${uname}
+  comment: ${device_description}
+  project:
+    name: ${project_name}
+    version: ${project_version}
