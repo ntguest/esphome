@@ -1,4 +1,4 @@
 time:
   - platform: sntp
-    id: sntp_time
+    #id: sntp_time
     timezone: UA
